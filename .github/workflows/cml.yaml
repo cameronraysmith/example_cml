@@ -26,15 +26,22 @@ jobs:
       -
         name: Train model
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
+          set -x
           pip install -r requirements.txt
           python train.py  # generate plot.png
 
           # Create CML report
-          # cat metrics.txt >> report.md
-          # echo '![](./plot.png "Confusion Matrix")' >> report.md
+          cat metrics.txt >> report.md
+          echo '![](./plot.png "Confusion Matrix")' >> report.md
           # cml comment create report.md
+          # --target=pr/1
+          # --token="$REPO_TOKEN"
+          cml comment create \
+          --log debug \
+          report.md
+          set +x
       -
         name: Setup tmate session post-training
         uses: mxschmitt/action-tmate@v3
